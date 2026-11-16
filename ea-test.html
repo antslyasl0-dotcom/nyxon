@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NYXON — فحص الاتصال بـEA</title>
+<meta name="theme-color" content="#0A0E13">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A0E13; --surface:#121922; --surface2:#18212C;
+  --line:#26323F; --line-soft:#1C242E;
+  --fg:#E9EEF4; --fg-dim:#B4C0CD; --muted:#7D8B9B;
+  --accent:#E8B33C; --accent-ink:#1A1304; --accent-soft:rgba(232,179,60,.13); --accent-line:rgba(232,179,60,.34);
+  --good:#38B87C; --good-soft:rgba(56,184,124,.14);
+  --mid:#C9772E; --mid-soft:rgba(201,119,46,.16);
+  --bad:#D94B50; --bad-soft:rgba(217,75,80,.14);
+  --font-d:'Readex Pro',system-ui,-apple-system,sans-serif;
+  --font-b:'IBM Plex Sans Arabic','Readex Pro',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#EDF1F5; --surface:#FFFFFF; --surface2:#F4F7FA;
+  --line:#D6DDE6; --line-soft:#E6EBF1;
+  --fg:#101821; --fg-dim:#3B4756; --muted:#64737F;
+  --accent:#8A5B00; --accent-ink:#FFFFFF; --accent-soft:rgba(138,91,0,.10); --accent-line:rgba(138,91,0,.26);
+  --good:#1C8A57; --good-soft:rgba(28,138,87,.12);
+  --mid:#95510F; --mid-soft:rgba(149,81,15,.12);
+  --bad:#B4262C; --bad-soft:rgba(180,38,44,.10);
+  color-scheme:light;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:15px;line-height:1.7}
+.wrap{max-width:680px;margin-inline:auto;padding:0 max(16px,env(safe-area-inset-left,0px)) 56px}
+h1,h2{font-family:var(--font-d);font-weight:600;margin:0;line-height:1.3}
+p{margin:0}
+.bar{background:var(--surface);border-bottom:1px solid var(--accent-line);margin-bottom:22px}
+.bar .wrap{display:flex;align-items:center;gap:11px;padding-block:14px}
+.bar img{width:40px;height:40px;border-radius:11px;background:#0A0E13}
+.bar b{font-family:var(--font-d);letter-spacing:.14em;font-size:18px;color:var(--accent)}
+.bar small{display:block;letter-spacing:0;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+.card-h{padding:14px 16px;border-bottom:1px solid var(--line-soft)}
+.card-h h2{font-size:16px}
+.pad{padding:16px}
+label{display:block;font-size:12px;color:var(--muted);font-family:var(--font-d);margin-bottom:5px}
+input,select{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--fg);
+  border-radius:9px;padding:10px 12px;font-family:var(--font-b);font-size:15px}
+.btn{font-family:var(--font-d);font-size:15px;font-weight:600;padding:13px 20px;border-radius:10px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.verdict{border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid}
+.verdict h2{font-size:17px;margin-bottom:8px}
+.v-good{background:var(--good-soft);border-color:var(--good);color:var(--fg)}
+.v-bad{background:var(--bad-soft);border-color:var(--bad);color:var(--fg)}
+.v-mid{background:var(--mid-soft);border-color:var(--mid);color:var(--fg)}
+.step{display:flex;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line-soft);align-items:flex-start}
+.step:last-child{border-bottom:0}
+.mk{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-d);font-size:13px;font-weight:700;margin-top:2px}
+.mk.ok{background:var(--good-soft);color:var(--good)}
+.mk.no{background:var(--bad-soft);color:var(--bad)}
+.mk.wait{background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.step b{font-family:var(--font-d);display:block}
+.step span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+pre{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:12px;
+  overflow:auto;max-height:260px;font-size:11.5px;direction:ltr;text-align:left;
+  font-family:ui-monospace,Menlo,monospace;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+.note{font-size:13px;color:var(--muted)}
+code{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+  font-size:12.5px;direction:ltr;unicode-bidi:isolate;display:inline-block;
+  font-family:ui-monospace,Menlo,monospace}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <img src="icon-192.png" alt="">
+  <span><b>NYXON</b><small>فحص الاتصال بـEA</small></span>
+</div></header>
+
+<div class="wrap">
+
+  <div class="card"><div class="pad">
+    <p>هذا الفحص يجاوب على سؤال واحد: <b>هل يقدر التطبيق يسحب أرقامكم من EA لحاله؟</b></p>
+    <p class="note" style="margin-top:10px">يرسل طلب واحد لـEA من متصفحك ويشوف وش يرجع.
+      ما يحفظ شي، وما يغيّر شي في تطبيقك.</p>
+  </div></div>
+
+  <div class="card">
+    <div class="card-h"><h2>بيانات ناديك</h2></div>
+    <div class="pad">
+      <div class="grid">
+        <div>
+          <label for="plat">المنصة</label>
+          <select id="plat">
+            <option value="common-gen5">بلايستيشن 5 / إكس بوكس سيريس</option>
+            <option value="common-gen4">بلايستيشن 4 / إكس بوكس ون</option>
+            <option value="pc">كمبيوتر</option>
+            <option value="nx">نينتندو سويتش</option>
+          </select>
+        </div>
+        <div>
+          <label for="club">اسم النادي</label>
+          <input id="club" type="text" placeholder="زي ما هو في اللعبة" autocapitalize="off">
+        </div>
+      </div>
+      <div style="margin-top:14px"><button class="btn" id="go" type="button">ابدأ الفحص</button></div>
+    </div>
+  </div>
+
+  <div id="out"></div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var BASE = "https://proclubs.ea.com/api/fc";
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]}); }
+
+  function steps(list) {
+    return '<div class="card"><div class="card-h"><h2>تفاصيل الفحص</h2></div>' +
+      list.map(function (s) {
+        var m = s.s === "ok" ? "✓" : s.s === "no" ? "!" : "…";
+        return '<div class="step"><span class="mk ' + s.s + '">' + m + '</span>' +
+          '<span><b>' + s.t + '</b><span>' + s.d + '</span></span></div>';
+      }).join("") + "</div>";
+  }
+
+  function verdict(cls, title, body) {
+    return '<div class="verdict ' + cls + '"><h2>' + title + "</h2>" + body + "</div>";
+  }
+
+  $("#go").addEventListener("click", function () {
+    var club = $("#club").value.trim();
+    if (!club) { $("#club").focus(); return; }
+    var plat = $("#plat").value;
+    var url = BASE + "/clubs/search?platform=" + encodeURIComponent(plat) +
+              "&clubName=" + encodeURIComponent(club);
+
+    var btn = $("#go");
+    btn.disabled = true; btn.textContent = "جاري الفحص…";
+    $("#out").innerHTML = steps([{ s: "wait", t: "نرسل الطلب لـEA", d: "لحظة…" }]);
+
+    var log = [];
+
+    // 1 — a normal, readable request: this is the one that matters
+    fetch(url, { method: "GET", headers: { "Accept": "application/json" } })
+      .then(function (r) {
+        return r.text().then(function (txt) {
+          log.push({ s: "ok", t: "EA ردّت والمتصفح قرأ الرد",
+                     d: "الحالة " + r.status + " · " + txt.length + " حرف" });
+          var pretty = txt;
+          try { pretty = JSON.stringify(JSON.parse(txt), null, 2); } catch (e) {}
+          $("#out").innerHTML =
+            verdict("v-good", "✅ يصير — السحب التلقائي ممكن",
+              "<p>EA ردّت على المتصفح وسمحت له يقرأ الرد. يعني نقدر نبني السحب التلقائي " +
+              "داخل التطبيق نفسه: اللاعب يفتح الصفحة وأرقامه تجي لحالها.</p>" +
+              '<p class="note" style="margin-top:10px">انسخ النص تحت وأرسله لكلود.</p>') +
+            steps(log) +
+            '<div class="card"><div class="card-h"><h2>اللي رجع من EA</h2></div>' +
+            '<div class="pad"><pre>' + esc(pretty.slice(0, 6000)) + "</pre></div></div>";
+          btn.disabled = false; btn.textContent = "أعد الفحص";
+        });
+      })
+      .catch(function (e1) {
+        log.push({ s: "no", t: "المتصفح ما قدر يقرأ الرد",
+                   d: esc(String(e1 && e1.message || e1)) });
+        // 2 — probe: did the server answer at all, or is it unreachable?
+        fetch(url, { mode: "no-cors" })
+          .then(function () {
+            log.push({ s: "ok", t: "سيرفر EA ردّ فعلاً",
+                       d: "وصلنا له، بس المتصفح يمنعنا نقرأ الرد" });
+            $("#out").innerHTML =
+              verdict("v-mid", "⚠️ EA ترد — بس المتصفح يمنع القراءة",
+                "<p>وصلنا لسيرفر EA من اتصالك، لكنه ما يعطي المتصفح إذن قراءة الرد " +
+                "(<code>CORS</code>). هذا قرار من EA، وما فيه إعداد يغيّره من طرفنا.</p>" +
+                "<p style=\"margin-top:10px\">يعني <b>السحب التلقائي داخل التطبيق مستحيل</b>. " +
+                "الطريق الباقي: أداة تشتغل على جهازك، أو إدخال من صورة.</p>") +
+              steps(log);
+            btn.disabled = false; btn.textContent = "أعد الفحص";
+          })
+          .catch(function (e2) {
+            log.push({ s: "no", t: "ما وصلنا لسيرفر EA أصلاً",
+                       d: esc(String(e2 && e2.message || e2)) });
+            $("#out").innerHTML =
+              verdict("v-bad", "❌ EA ما ردّت على الطلب",
+                "<p>الطلب انقطع قبل ما يوصل. غالباً EA تحجب هذا النوع من الطلبات، " +
+                "أو اسم النادي/المنصة غلط.</p>" +
+                "<p style=\"margin-top:10px\">جرّب تتأكد من اسم النادي والمنصة وأعد الفحص. " +
+                "لو تكرر، السحب التلقائي مو ممكن ونمشي على إدخال الصورة.</p>") +
+              steps(log);
+            btn.disabled = false; btn.textContent = "أعد الفحص";
+          });
+      });
+  });
+})();
+</script>
+</body></html>
