@@ -2307,9 +2307,16 @@ window.addEventListener("hashchange",function(){
 })();
 </script>
 <script>
-if("serviceWorker" in navigator)
-  window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
-  });
+/* Offline caching is off while we get the site settled: a stale cached page is
+   the hardest kind of bug to see. This also clears any worker a previous visit
+   installed. */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    rs.forEach(function(r){r.unregister()});
+  }).catch(function(){});
+  if(window.caches&&caches.keys)caches.keys().then(function(ks){
+    ks.forEach(function(k){caches.delete(k)});
+  }).catch(function(){});
+}
 </script>
 </body></html>

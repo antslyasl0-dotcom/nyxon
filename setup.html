@@ -243,6 +243,16 @@ service cloud.firestore {
 }
 </script>
 
+<script>
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    rs.forEach(function(r){r.unregister()});
+  }).catch(function(){});
+  if(window.caches&&caches.keys)caches.keys().then(function(ks){
+    ks.forEach(function(k){caches.delete(k)});
+  }).catch(function(){});
+}
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -381,7 +391,9 @@ service cloud.firestore {
 
   // first pass, then follow the sign-in state
   run();
+  var tries = 0;
   var t = setInterval(function () {
+    if (++tries > 40) { clearInterval(t); return; }
     if (typeof firebase === "undefined" || !auth) return;
     clearInterval(t);
     auth.onAuthStateChanged(function (u) {
