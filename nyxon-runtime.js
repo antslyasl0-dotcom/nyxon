@@ -160,7 +160,11 @@
   window.nyxonSignIn = function () {
     var p = new firebase.auth.GoogleAuthProvider();
     return auth.signInWithPopup(p).catch(function (e) {
-      if (e && e.code === "auth/popup-blocked") return auth.signInWithRedirect(p);
+      var c = (e && e.code) || "";
+      if (c === "auth/popup-blocked" || c === "auth/cancelled-popup-request" ||
+          c === "auth/operation-not-supported-in-this-environment") {
+        return auth.signInWithRedirect(p);
+      }
       throw e;
     });
   };

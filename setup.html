@@ -378,8 +378,15 @@ if("serviceWorker" in navigator){
   $("#signin").addEventListener("click", function () {
     if (!auth) { alert("عبّي config.js أول."); return; }
     var p = new firebase.auth.GoogleAuthProvider();
+    /* Safari on iPhone blocks popups by default, so fall back to a full-page
+       redirect instead of telling the person to go change a browser setting */
     auth.signInWithPopup(p).catch(function (e) {
       var c = (e && e.code) || "";
+      if (c === "auth/popup-blocked" || c === "auth/cancelled-popup-request" ||
+          c === "auth/operation-not-supported-in-this-environment") {
+        return auth.signInWithRedirect(p);
+      }
+      if (c === "auth/popup-closed-by-user") return;
       alert(c === "auth/unauthorized-domain"
         ? "دومين الموقع مو مسموح في Firebase. أضفه في: Authentication ← Settings ← Authorized domains."
         : c === "auth/operation-not-allowed"
