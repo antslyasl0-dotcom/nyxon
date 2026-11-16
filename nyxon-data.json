@@ -1,26 +1,107 @@
 {
-  "_note": "بيانات NYXON الحالية، مسحوبة من التطبيق على claude.ai بتاريخ 2026-11-16. تُستورد من: الإدارة ← استورد بيانات.",
+  "_note": "بيانات NYXON من تطبيق claude.ai — محدّثة 2026-11-16. تُستورد من: الإدارة ← نسخة احتياطية ← استورد.",
   "clubs": {
-    "x52vtt7twban": { "name": "NYXON1", "createdAt": "2026-11-15T21:10:19.439Z" }
+    "x52vtt7twban": {
+      "createdAt": "2026-11-15T21:10:19.439Z",
+      "name": "NYXON1"
+    },
+    "xh1nm8qc09m9": {
+      "createdAt": "2026-11-16T08:25:14.673Z",
+      "name": "NYXON2"
+    }
   },
   "players": {
     "xkp34cwwwxe0": {
-      "name": "Hamza", "gamertag": "Hhahj", "pos": "CM",
-      "clubId": "x52vtt7twban", "role": "player", "titles": [],
-      "userId": "", "photo": "", "createdAt": "2026-11-15T21:10:48.072Z"
+      "clubId": "x52vtt7twban",
+      "createdAt": "2026-11-15T21:10:48.072Z",
+      "gamertag": "Hhahj",
+      "name": "Hamza",
+      "pos": "CM",
+      "role": "player",
+      "titles": [],
+      "userId": "",
+      "photo": ""
     },
     "xtf87zjbdveu": {
-      "name": "Hamza", "gamertag": "Hhhh", "pos": "CM",
-      "clubId": "x52vtt7twban", "role": "player", "titles": [],
-      "userId": "", "photo": "", "createdAt": "2026-11-16T00:39:55.974Z"
+      "clubId": "x52vtt7twban",
+      "createdAt": "2026-11-16T00:39:55.974Z",
+      "gamertag": "Hhhh",
+      "name": "Hamza",
+      "pos": "CM",
+      "role": "admin",
+      "titles": [],
+      "userId": "",
+      "photo": ""
+    },
+    "xy04ekipynyu": {
+      "clubId": "xh1nm8qc09m9",
+      "createdAt": "2026-11-16T08:23:59.958Z",
+      "gamertag": "one__Relax-Only",
+      "name": "6rad",
+      "pos": "RB",
+      "role": "admin",
+      "titles": [],
+      "userId": "",
+      "photo": ""
     },
     "xynglkc09k1r": {
-      "name": "حسن", "gamertag": "Jahah", "pos": "CM",
-      "clubId": "x52vtt7twban", "role": "captain", "titles": [],
-      "userId": "", "photo": "", "createdAt": "2026-11-15T21:10:19.439Z"
+      "clubId": "x52vtt7twban",
+      "createdAt": "2026-11-15T22:40:07.358Z",
+      "gamertag": "Jahah",
+      "name": "حسن",
+      "pos": "CM",
+      "role": "captain",
+      "titles": [],
+      "userId": "",
+      "photo": ""
     }
   },
   "matches": {
+    "x5n9eckc8snn": {
+      "clubId": "xh1nm8qc09m9",
+      "opponent": "شيم",
+      "type": "external",
+      "cupId": "",
+      "date": "2026-11-17T22:31",
+      "status": "played",
+      "scoreFor": 4,
+      "scoreAgainst": 0,
+      "createdAt": "2026-11-16T08:31:52.595Z",
+      "lineup": {
+        "formation": "4-3-2-1",
+        "slots": [
+          null,
+          null,
+          null,
+          null,
+          "xy04ekipynyu",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bench": [],
+        "locked": false,
+        "by": "",
+        "at": ""
+      },
+      "stats": {
+        "xy04ekipynyu": {
+          "played": true,
+          "cat": "FB",
+          "goals": 0,
+          "assists": 1,
+          "shots": 0,
+          "tackles": 14,
+          "passes": 20,
+          "saves": 0,
+          "motm": true,
+          "red": false
+        }
+      }
+    },
     "xla8t4zf8emr": {
       "clubId": "x52vtt7twban",
       "opponent": "NYXOM2",
@@ -31,44 +112,197 @@
       "scoreFor": 2,
       "scoreAgainst": 2,
       "createdAt": "2026-11-15T21:47:43.251Z",
-      "lineup": { "formation": "5-3-2", "slots": [], "bench": [], "locked": false, "by": "", "at": "" },
+      "lineup": {
+        "formation": "5-3-2",
+        "slots": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "x937w8pb8rpu",
+          null,
+          "xynglkc09k1r"
+        ],
+        "bench": [],
+        "locked": true,
+        "by": "",
+        "at": ""
+      },
       "stats": {
         "xkp34cwwwxe0": {
-          "played": true, "cat": "CM", "goals": 2, "assists": 1, "shots": 2,
-          "tackles": 2, "passes": 10, "saves": 0, "motm": true, "red": false
+          "played": true,
+          "cat": "CM",
+          "goals": 2,
+          "assists": 1,
+          "shots": 2,
+          "tackles": 2,
+          "passes": 10,
+          "saves": 0,
+          "motm": true,
+          "red": false
         },
         "xtf87zjbdveu": {
-          "played": true, "cat": "CM", "goals": 2, "assists": 5, "shots": 0,
-          "tackles": 0, "passes": 0, "saves": 0, "motm": false, "red": false
+          "played": true,
+          "cat": "CM",
+          "goals": 2,
+          "assists": 5,
+          "shots": 0,
+          "tackles": 0,
+          "passes": 0,
+          "saves": 0,
+          "motm": false,
+          "red": false
         },
         "xynglkc09k1r": {
-          "played": true, "cat": "CM", "goals": 0, "assists": 0, "shots": 0,
-          "tackles": 0, "passes": 0, "saves": 0, "motm": false, "red": false
+          "played": true,
+          "cat": "CM",
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "tackles": 0,
+          "passes": 0,
+          "saves": 0,
+          "motm": false,
+          "red": false
         }
+      }
+    },
+    "xpk0ljkpa24v": {
+      "clubId": "x52vtt7twban",
+      "opponent": "نسنسن",
+      "type": "external",
+      "cupId": "",
+      "date": "2026-11-18T10:36",
+      "status": "played",
+      "scoreFor": 6,
+      "scoreAgainst": 2,
+      "createdAt": "2026-11-16T07:36:52.303Z",
+      "stats": {
+        "xkp34cwwwxe0": {
+          "played": true,
+          "cat": "CM",
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "tackles": 0,
+          "passes": 0,
+          "saves": 0,
+          "motm": true,
+          "red": false
+        },
+        "xtf87zjbdveu": {
+          "played": true,
+          "cat": "CM",
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "tackles": 0,
+          "passes": 0,
+          "saves": 0,
+          "motm": false,
+          "red": false
+        },
+        "xynglkc09k1r": {
+          "played": true,
+          "cat": "CM",
+          "goals": 5,
+          "assists": 4,
+          "shots": 0,
+          "tackles": 0,
+          "passes": 0,
+          "saves": 0,
+          "motm": false,
+          "red": false
+        }
+      },
+      "lineup": {
+        "formation": "4-3-3",
+        "slots": [],
+        "bench": [],
+        "locked": false,
+        "by": "",
+        "at": ""
       }
     }
   },
   "attendance": {},
   "cups": {},
   "posts": {
+    "xco3a63n4nne": {
+      "at": "2026-11-16T08:28:39.482Z",
+      "body": "بطولة نكسون الداخليه",
+      "scope": "x52vtt7twban",
+      "title": "استدعاء"
+    },
     "xhtccx1a4t6w": {
-      "title": "Hahj", "body": "تعال",
-      "scope": "x52vtt7twban", "at": "2026-11-15T21:44:55.496Z"
+      "at": "2026-11-15T21:44:55.496Z",
+      "body": "تعال",
+      "scope": "x52vtt7twban",
+      "title": "Hahj"
     }
   },
   "config": {
-    "app": { "minMatches": 5, "seasonStart": "" },
+    "app": {
+      "minMatches": 5,
+      "seasonStart": ""
+    },
     "scoring": {
-      "global": { "win": 2, "draw": 1, "motm": 3, "red": -3 },
       "cats": {
-        "GK":  { "cleanSheet": 5, "save": 1, "conceded": -1 },
-        "CB":  { "cleanSheet": 4, "tackle": 1, "goal": 4, "assist": 3 },
-        "FB":  { "cleanSheet": 3, "tackle": 1, "goal": 4, "assist": 3 },
-        "CDM": { "tackle": 1, "pass10": 1, "cleanSheet": 2, "goal": 4, "assist": 3 },
-        "CM":  { "pass10": 1, "goal": 3, "assist": 3, "tackle": 0.5 },
-        "CAM": { "assist": 4, "goal": 3, "shot": 0.5 },
-        "W":   { "goal": 3, "assist": 3, "shot": 0.5 },
-        "ST":  { "goal": 3, "assist": 2, "shot": 0.5 }
+        "CAM": {
+          "assist": 4,
+          "goal": 3,
+          "shot": 0.5
+        },
+        "CB": {
+          "assist": 3,
+          "cleanSheet": 4,
+          "goal": 4,
+          "tackle": 1
+        },
+        "CDM": {
+          "assist": 3,
+          "cleanSheet": 2,
+          "goal": 4,
+          "pass10": 1,
+          "tackle": 1
+        },
+        "CM": {
+          "assist": 3,
+          "goal": 3,
+          "pass10": 1,
+          "tackle": 0.5
+        },
+        "FB": {
+          "assist": 3,
+          "cleanSheet": 3,
+          "goal": 4,
+          "tackle": 1
+        },
+        "GK": {
+          "cleanSheet": 5,
+          "conceded": -1,
+          "save": 1
+        },
+        "ST": {
+          "assist": 2,
+          "goal": 3,
+          "shot": 0.5
+        },
+        "W": {
+          "assist": 3,
+          "goal": 3,
+          "shot": 0.5
+        }
+      },
+      "global": {
+        "draw": 1,
+        "motm": 3,
+        "red": -3,
+        "win": 2
       }
     }
   }
