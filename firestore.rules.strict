@@ -1,0 +1,130 @@
+rules_version = '2';
+
+// قواعد قاعدة بيانات NYXON — هذي هي "قفل النظام" الحقيقي.
+// الواجهة تخفي الأزرار، وهذي القواعد تمنع الكتابة فعلياً حتى لو أحد تحايل عليها.
+//
+// منشورة ✅ — المعرّف تحت هو معرّف مالك التطبيق، ومطابق لـ config.js.
+// لو بغيت تغيّر المالك، بدّله في المكانين معاً.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ====== من أنت ======
+    function OWNER() { return 'b9iTpBRsxdexdw44633V3IjDU9M2'; }
+
+    function signedIn() { return request.auth != null; }
+    function uid()      { return request.auth.uid; }
+
+    function isOwner()  { return signedIn() && uid() == OWNER(); }
+
+    // ربط الحساب باللاعب: وثيقة links/<uid> = { playerId: "..." }
+    // الإدارة هي اللي تكتبها لما توافق على طلب التعريف.
+    function hasLink() {
+      return signedIn() && exists(/databases/$(database)/documents/links/$(uid()));
+    }
+    function myPlayerId() {
+      return get(/databases/$(database)/documents/links/$(uid())).data.playerId;
+    }
+    function myRole() {
+      return get(/databases/$(database)/documents/players/$(myPlayerId())).data.role;
+    }
+
+    function isAdmin() { return isOwner() || (hasLink() && myRole() == 'admin'); }
+    function isStaff() {
+      return isAdmin() || (hasLink() && (myRole() == 'captain' || myRole() == 'vice'));
+    }
+    // الكابتن والإدارة: ينزّلون المباريات ويسجلون النتائج
+
+    // يمنع أي أحد غير الإدارة من تغيير الرتبة أو إعادة ربط الحساب
+    function keepsRoleAndLink() {
+      return request.resource.data.role   == resource.data.role
+          && request.resource.data.userId == resource.data.userId;
+    }
+
+    // ====== يقرأ الكل، يكتب من يستاهل ======
+
+    // الصدارة والمباريات والتشكيلات مفتوحة للعرض بدون أي حساب.
+    match /clubs/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /players/{id} {
+      allow read:   if true;
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+      // الإدارة تعدّل كل شي؛ الكابتن ونائبه يعدلون بدون مساس بالرتبة؛
+      // واللاعب يعدّل ملفه هو فقط.
+      allow update: if isAdmin()
+                    || (isStaff() && keepsRoleAndLink())
+                    || (hasLink() && id == myPlayerId() && keepsRoleAndLink());
+    }
+
+    // the lineup lives inside the match document, and the vice captain builds
+    // lineups — so he has to be able to write here too
+    match /matches/{id} {
+      allow read:  if true;
+      allow write: if isStaff();
+    }
+
+    // الحضور وثيقة مستقلة لكل لاعب في كل مباراة: <matchId>__<playerId>
+    // عشان اللاعب يأكد حضوره بدون ما يكتب على المباراة كلها
+    // (وهذا كمان يمنع ضياع تأكيد لاعب لما اثنين يأكدون بنفس اللحظة).
+    match /attendance/{id} {
+      allow read:   if true;
+      allow write:  if isStaff()
+                    || (hasLink()
+                        && request.resource.data.playerId == myPlayerId()
+                        && request.resource.data.status in ['in', 'excused']);
+      allow delete: if isStaff();
+    }
+
+    match /cups/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /posts/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // جدول النقاط والحد الأدنى وبداية الموسم — الإدارة فقط
+    match /config/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ====== الطلبات ======
+
+    // طلب تعريف: كل واحد يكتب طلبه هو تحت معرّفه، والإدارة تقرأ وتحذف.
+    // create AND update: a second attempt must not be refused just because
+    // the first one already left a document here
+    match /claims/{claimUid} {
+      allow read:           if isAdmin();
+      allow create, update: if signedIn() && claimUid == uid()
+                            && request.resource.data.userId == uid();
+      allow delete:         if isAdmin() || (signedIn() && claimUid == uid());
+    }
+
+    // طلب انضمام لواحد اسمه مو في القائمة أصلاً
+    match /requests/{id} {
+      allow read:   if isAdmin();
+      allow create: if signedIn();
+      allow delete: if isAdmin();
+      allow update: if false;
+    }
+
+    // ربط الحسابات: الإدارة فقط تكتبها. القراءة مقفلة —
+    // القواعد نفسها تقرأها بـget() وهي ما تمر على القواعد.
+    match /links/{linkUid} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // أي مسار ثاني: مقفل
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
