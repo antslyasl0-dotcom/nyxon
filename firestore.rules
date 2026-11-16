@@ -34,9 +34,6 @@ service cloud.firestore {
       return isAdmin() || (hasLink() && (myRole() == 'captain' || myRole() == 'vice'));
     }
     // الكابتن والإدارة: ينزّلون المباريات ويسجلون النتائج
-    function isMatchStaff() {
-      return isAdmin() || (hasLink() && myRole() == 'captain');
-    }
 
     // يمنع أي أحد غير الإدارة من تغيير الرتبة أو إعادة ربط الحساب
     function keepsRoleAndLink() {
@@ -63,9 +60,11 @@ service cloud.firestore {
                     || (hasLink() && id == myPlayerId() && keepsRoleAndLink());
     }
 
+    // the lineup lives inside the match document, and the vice captain builds
+    // lineups — so he has to be able to write here too
     match /matches/{id} {
       allow read:  if true;
-      allow write: if isMatchStaff();
+      allow write: if isStaff();
     }
 
     // الحضور وثيقة مستقلة لكل لاعب في كل مباراة: <matchId>__<playerId>
