@@ -15,5 +15,5 @@ window.NYXON_CONFIG = {
   /* معرّفك كمالك للتطبيق.
      افتح setup.html على موقعك، سجّل دخولك بقوقل، وهي تعطيك المعرّف
      بزر نسخ. حطه هنا وفي firestore.rules مكان OWNER_UID. */
-  ownerUid: ""
+  ownerUid: "b9iTpBRsxdexdw44633V3IjDU9M2"
 };
