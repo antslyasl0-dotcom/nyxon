@@ -3,14 +3,14 @@ rules_version = '2';
 // قواعد قاعدة بيانات NYXON — هذي هي "قفل النظام" الحقيقي.
 // الواجهة تخفي الأزرار، وهذي القواعد تمنع الكتابة فعلياً حتى لو أحد تحايل عليها.
 //
-// قبل ما تلصقها في Firebase: بدّل OWNER_UID تحت بالمعرّف حقك.
-// تلقاه في Firebase Console ← Authentication ← Users ← عمود User UID.
+// منشورة ✅ — المعرّف تحت هو معرّف مالك التطبيق، ومطابق لـ config.js.
+// لو بغيت تغيّر المالك، بدّله في المكانين معاً.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // ====== من أنت ======
-    function OWNER() { return 'OWNER_UID'; }
+    function OWNER() { return 'b9iTpBRsxdexdw44633V3IjDU9M2'; }
 
     function signedIn() { return request.auth != null; }
     function uid()      { return request.auth.uid; }
