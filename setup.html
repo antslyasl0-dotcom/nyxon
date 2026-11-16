@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NYXON — فحص الإعداد</title>
+<meta name="theme-color" content="#0A0E13">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A0E13; --surface:#121922; --surface2:#18212C; --raise:#212C3A;
+  --line:#26323F; --line-soft:#1C242E;
+  --fg:#E9EEF4; --fg-dim:#B4C0CD; --muted:#7D8B9B;
+  --accent:#E8B33C; --accent-ink:#1A1304; --accent-soft:rgba(232,179,60,.13); --accent-line:rgba(232,179,60,.34);
+  --good:#38B87C; --good-soft:rgba(56,184,124,.14);
+  --mid:#C9772E; --mid-soft:rgba(201,119,46,.16);
+  --bad:#D94B50; --bad-soft:rgba(217,75,80,.14);
+  --font-d:'Readex Pro',system-ui,-apple-system,sans-serif;
+  --font-b:'IBM Plex Sans Arabic','Readex Pro',system-ui,-apple-system,sans-serif;
+  --r:12px; color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#EDF1F5; --surface:#FFFFFF; --surface2:#F4F7FA; --raise:#E7ECF2;
+  --line:#D6DDE6; --line-soft:#E6EBF1;
+  --fg:#101821; --fg-dim:#3B4756; --muted:#64737F;
+  --accent:#8A5B00; --accent-ink:#FFFFFF; --accent-soft:rgba(138,91,0,.10); --accent-line:rgba(138,91,0,.26);
+  --good:#1C8A57; --good-soft:rgba(28,138,87,.12);
+  --mid:#95510F; --mid-soft:rgba(149,81,15,.12);
+  --bad:#B4262C; --bad-soft:rgba(180,38,44,.10);
+  color-scheme:light;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:15px;line-height:1.7}
+.wrap{max-width:760px;margin-inline:auto;padding:0 max(16px,env(safe-area-inset-left,0px)) 56px}
+h1,h2,h3{font-family:var(--font-d);font-weight:600;margin:0;line-height:1.3}
+p{margin:0}
+.bar{background:var(--surface);border-bottom:1px solid var(--accent-line);margin-bottom:22px}
+.bar .wrap{display:flex;align-items:center;gap:11px;padding-block:14px}
+.bar img{width:40px;height:40px;border-radius:11px;background:#0A0E13}
+.bar b{font-family:var(--font-d);letter-spacing:.14em;font-size:18px;color:var(--accent)}
+.bar small{display:block;letter-spacing:0;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px}
+.card-h{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card-h h2{font-size:16px}
+.pad{padding:16px}
+.btn{font-family:var(--font-d);font-size:13.5px;font-weight:500;padding:9px 15px;border-radius:9px;
+  border:1px solid var(--line);background:var(--surface2);color:var(--fg-dim);cursor:pointer}
+.btn:hover{color:var(--fg);border-color:var(--muted)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.step{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line-soft);align-items:flex-start}
+.step:last-child{border-bottom:0}
+.step .mk{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--font-d);font-size:14px;font-weight:700;margin-top:2px}
+.mk.wait{background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.mk.ok{background:var(--good-soft);color:var(--good)}
+.mk.no{background:var(--bad-soft);color:var(--bad)}
+.mk.warn{background:var(--mid-soft);color:var(--mid)}
+.step .tx{min-width:0;flex:1}
+.step .tx b{font-family:var(--font-d);display:block}
+.step .tx span{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface2);
+  border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.5px;
+  direction:ltr;unicode-bidi:isolate;display:inline-block}
+textarea{width:100%;min-height:200px;background:var(--surface2);border:1px solid var(--line);
+  color:var(--fg);border-radius:9px;padding:11px;font-family:ui-monospace,Menlo,monospace;
+  font-size:12px;direction:ltr;text-align:left;line-height:1.5}
+.note{font-size:13px;color:var(--muted)}
+.uid{font-family:ui-monospace,Menlo,monospace;font-size:14px;direction:ltr;unicode-bidi:isolate;
+  background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);
+  border-radius:8px;padding:8px 12px;display:inline-block;word-break:break-all}
+a{color:var(--accent)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <img src="icon-192.png" alt="">
+  <span><b>NYXON</b><small>فحص الإعداد</small></span>
+</div></header>
+
+<div class="wrap">
+
+  <div class="card"><div class="pad">
+    <p>هذي الصفحة تفحص إعداد موقعك خطوة خطوة وتقول لك بالضبط وش ناقص.
+       اشتغل من فوق لتحت، واضغط <b>أعد الفحص</b> بعد كل تعديل.</p>
+    <div class="row" style="margin-top:14px">
+      <button class="btn pri" id="recheck" type="button">أعد الفحص</button>
+      <a class="btn" href="index.html">افتح التطبيق</a>
+    </div>
+  </div></div>
+
+  <div class="card">
+    <div class="card-h"><h2>الفحص</h2></div>
+    <div id="steps"></div>
+  </div>
+
+  <div class="card" id="authCard">
+    <div class="card-h"><h2>معرّفك</h2></div>
+    <div class="pad">
+      <p class="note" id="authNote">سجّل دخولك بقوقل عشان نعرف معرّفك — تحتاجه في خطوتين.</p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn pri" id="signin" type="button">سجّل دخول بقوقل</button>
+        <button class="btn hide" id="signout" type="button">خروج</button>
+      </div>
+      <div id="uidBox" class="hide" style="margin-top:14px">
+        <span class="uid" id="uidVal"></span>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="copyUid" type="button">انسخ المعرّف</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>قواعد الحماية</h2>
+      <span class="note" style="margin-inline-start:auto">الصقها في Firebase ← Firestore ← Rules ← Publish</span>
+    </div>
+    <div class="pad">
+      <p class="note" id="rulesNote">سجّل دخولك فوق، وبيتعبّى معرّفك هنا تلقائياً.</p>
+      <div class="row" style="margin:12px 0">
+        <button class="btn pri" id="copyRules" type="button">انسخ القواعد</button>
+        <a class="btn" id="fbLink" href="https://console.firebase.google.com" target="_blank" rel="noopener">افتح لوحة Firebase</a>
+      </div>
+      <textarea id="rulesOut" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>بعد ما يخلص كل شي</h2></div>
+    <div class="pad">
+      <p>١. افتح <a href="index.html">التطبيق</a> وسجّل دخولك — لازم تنفتح لك <b>لوحة الإدارة</b>.</p>
+      <p>٢. من اللوحة: <b>نسخة احتياطية ← استورد</b> واختر ملف <code>nyxon-data.json</code>.</p>
+      <p>٣. جرّب الرابط في متصفح ثاني بدون تسجيل دخول — لازم تشوف الصدارة.</p>
+      <p style="margin-top:10px" class="note">بعدها احذف <code>setup.html</code> لو تبي، أو خلّه — ما يضر.</p>
+    </div>
+  </div>
+
+</div>
+
+<script type="text/plain" id="rulesTpl">rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function OWNER() { return 'OWNER_UID'; }
+
+    function signedIn() { return request.auth != null; }
+    function uid()      { return request.auth.uid; }
+    function isOwner()  { return signedIn() && uid() == OWNER(); }
+
+    function hasLink() {
+      return signedIn() && exists(/databases/$(database)/documents/links/$(uid()));
+    }
+    function myPlayerId() {
+      return get(/databases/$(database)/documents/links/$(uid())).data.playerId;
+    }
+    function myRole() {
+      return get(/databases/$(database)/documents/players/$(myPlayerId())).data.role;
+    }
+
+    function isAdmin() { return isOwner() || (hasLink() && myRole() == 'admin'); }
+    function isStaff() {
+      return isAdmin() || (hasLink() && (myRole() == 'captain' || myRole() == 'vice'));
+    }
+    function isMatchStaff() {
+      return isAdmin() || (hasLink() && myRole() == 'captain');
+    }
+    function keepsRoleAndLink() {
+      return request.resource.data.role   == resource.data.role
+          && request.resource.data.userId == resource.data.userId;
+    }
+
+    match /clubs/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /players/{id} {
+      allow read:   if true;
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+      allow update: if isAdmin()
+                    || (isStaff() && keepsRoleAndLink())
+                    || (hasLink() && id == myPlayerId() && keepsRoleAndLink());
+    }
+
+    match /matches/{id} {
+      allow read:  if true;
+      allow write: if isMatchStaff();
+    }
+
+    match /attendance/{id} {
+      allow read:   if true;
+      allow write:  if isStaff()
+                    || (hasLink()
+                        && request.resource.data.playerId == myPlayerId()
+                        && request.resource.data.status in ['in', 'excused']);
+      allow delete: if isStaff();
+    }
+
+    match /cups/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /posts/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /config/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /claims/{claimUid} {
+      allow read:   if isAdmin();
+      allow create: if signedIn() && claimUid == uid()
+                    && request.resource.data.userId == uid();
+      allow delete: if isAdmin() || (signedIn() && claimUid == uid());
+      allow update: if false;
+    }
+
+    match /requests/{id} {
+      allow read:   if isAdmin();
+      allow create: if signedIn();
+      allow delete: if isAdmin();
+      allow update: if false;
+    }
+
+    match /links/{linkUid} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="config.js" onerror="window.__noConfig=true"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var steps = [], uid = null, app = null, fs = null, auth = null;
+  var CFG = window.NYXON_CONFIG || null;
+
+  function placeholderish(v) {
+    return !v || /ضع|اسم-مشروعك|^0+$|^1:0/.test(String(v));
+  }
+  function add(state, title, detail) { steps.push({ s: state, t: title, d: detail }); }
+  function paint() {
+    $("#steps").innerHTML = steps.map(function (x) {
+      var mark = x.s === "ok" ? "✓" : x.s === "no" ? "!" : x.s === "warn" ? "!" : "…";
+      return '<div class="step"><span class="mk ' + x.s + '">' + mark + '</span>' +
+        '<span class="tx"><b>' + x.t + '</b><span>' + x.d + '</span></span></div>';
+    }).join("");
+  }
+  function esc(s){ return String(s).replace(/[&<>]/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]}); }
+
+  function fillRules() {
+    var tpl = document.getElementById("rulesTpl").textContent;
+    var out = uid ? tpl.split("OWNER_UID").join(uid) : tpl;
+    $("#rulesOut").value = out;
+    $("#rulesNote").innerHTML = uid
+      ? "معرّفك مُدرج داخل القواعد تحت. انسخها كلها والصقها في Firebase، واضغط <b>Publish</b>."
+      : "سجّل دخولك فوق، وبيتعبّى معرّفك هنا تلقائياً.";
+  }
+
+  function run() {
+    steps = [];
+    CFG = window.NYXON_CONFIG || null;
+
+    // 1 — config.js
+    if (window.__noConfig || !CFG || !CFG.firebase) {
+      add("no", "ملف config.js ناقص",
+        "سمِّ <code>config.example.js</code> باسم <code>config.js</code> وعبّيه من Firebase ← ⚙ Project settings ← Your apps.");
+      paint(); fillRules(); return;
+    }
+    var f = CFG.firebase;
+    if (placeholderish(f.apiKey) || placeholderish(f.projectId)) {
+      add("no", "config.js ما انعبّى",
+        "القيم فيه لسه كما هي. الصق <code>firebaseConfig</code> من لوحة Firebase.");
+      paint(); fillRules(); return;
+    }
+    add("ok", "config.js معبّى", "المشروع: <code>" + esc(f.projectId) + "</code>");
+
+    // 2 — SDK + init
+    if (typeof firebase === "undefined") {
+      add("no", "مكتبة Firebase ما تحمّلت", "تأكد من اتصالك بالإنترنت وأعد تحميل الصفحة.");
+      paint(); fillRules(); return;
+    }
+    try {
+      app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(f);
+      fs = firebase.firestore(); auth = firebase.auth();
+      add("ok", "الاتصال بالمشروع تمام", "المكتبة اشتغلت والمشروع معروف.");
+    } catch (e) {
+      add("no", "ما قدرنا نبدأ Firebase", esc(e && e.message || ""));
+      paint(); fillRules(); return;
+    }
+
+    // 3 — signed in?
+    if (!uid) {
+      add("wait", "ما سجّلت دخولك بعد", "اضغط «سجّل دخول بقوقل» تحت. لو طلع خطأ <code>unauthorized-domain</code>، أضف دومين موقعك في Firebase ← Authentication ← Settings ← Authorized domains.");
+      paint(); fillRules(); return;
+    }
+    add("ok", "الدخول بقوقل شغّال", "معرّفك ظاهر تحت.");
+
+    // 4 — ownerUid
+    if (placeholderish(CFG.ownerUid)) {
+      add("no", "ownerUid ما انحط في config.js",
+        "انسخ معرّفك تحت وحطه في <code>config.js</code> مكان <code>ownerUid</code>، ثم ارفع الملف من جديد.");
+    } else if (CFG.ownerUid !== uid) {
+      add("warn", "ownerUid مختلف عن حسابك الحالي",
+        "المكتوب في config.js: <code>" + esc(CFG.ownerUid) + "</code> — وأنت داخل بمعرّف ثاني. إذا هذا الحساب هو حساب الإدارة، بدّل القيمة.");
+    } else {
+      add("ok", "ownerUid مضبوط", "أنت مالك التطبيق.");
+    }
+
+    // 5 — read
+    fs.doc("config/app").get().then(function () {
+      add("ok", "القراءة من قاعدة البيانات شغّالة", "Firestore يرد والقواعد تسمح بالقراءة.");
+      paint();
+      return fs.doc("config/_setupcheck").set({ at: new Date().toISOString() });
+    }).then(function () {
+      add("ok", "الكتابة شغّالة وأنت الإدارة", "القواعد منشورة وتعرفك. الإعداد خلص — افتح التطبيق.");
+      paint();
+      return fs.doc("config/_setupcheck").delete().catch(function () { });
+    }).catch(function (e) {
+      var c = (e && e.code) || "";
+      if (c === "permission-denied") {
+        add("no", "القواعد ترفض",
+          "غالباً ما لصقت القواعد بعد، أو المعرّف داخلها مو معرّفك. انسخ القواعد تحت (معرّفك فيها) والصقها في Firebase ← Firestore ← Rules ← Publish.");
+      } else if (c === "unavailable" || c === "failed-precondition") {
+        add("no", "ما قدرنا نوصل Firestore",
+          "تأكد إنك أنشأت قاعدة Firestore في المشروع (Build ← Firestore Database ← Create database).");
+      } else {
+        add("no", "فشل الفحص", esc(c || (e && e.message) || ""));
+      }
+      paint();
+    });
+
+    paint(); fillRules();
+  }
+
+  $("#recheck").addEventListener("click", run);
+  $("#copyRules").addEventListener("click", function () {
+    var t = $("#rulesOut"); t.select();
+    try { document.execCommand("copy"); } catch (e) { }
+    if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(function () { });
+    this.textContent = "انتسخت ✓";
+    var b = this; setTimeout(function () { b.textContent = "انسخ القواعد"; }, 1800);
+  });
+  $("#copyUid").addEventListener("click", function () {
+    if (navigator.clipboard && uid) navigator.clipboard.writeText(uid).catch(function () { });
+    this.textContent = "انتسخ ✓";
+    var b = this; setTimeout(function () { b.textContent = "انسخ المعرّف"; }, 1800);
+  });
+  $("#signin").addEventListener("click", function () {
+    if (!auth) { alert("عبّي config.js أول."); return; }
+    var p = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(p).catch(function (e) {
+      var c = (e && e.code) || "";
+      alert(c === "auth/unauthorized-domain"
+        ? "دومين الموقع مو مسموح في Firebase. أضفه في: Authentication ← Settings ← Authorized domains."
+        : c === "auth/operation-not-allowed"
+          ? "مزود قوقل مو مفعّل. فعّله في: Authentication ← Sign-in method ← Google."
+          : "ما تم الدخول: " + c);
+    });
+  });
+  $("#signout").addEventListener("click", function () { if (auth) auth.signOut(); });
+
+  // first pass, then follow the sign-in state
+  run();
+  var t = setInterval(function () {
+    if (typeof firebase === "undefined" || !auth) return;
+    clearInterval(t);
+    auth.onAuthStateChanged(function (u) {
+      uid = u ? u.uid : null;
+      $("#uidBox").className = uid ? "" : "hide";
+      $("#signout").className = uid ? "btn" : "btn hide";
+      $("#signin").textContent = uid ? "بدّل الحساب" : "سجّل دخول بقوقل";
+      if (uid) $("#uidVal").textContent = uid;
+      $("#authNote").textContent = uid
+        ? "هذا معرّفك. يروح في مكانين: config.js (ownerUid) وقواعد الحماية تحت."
+        : "سجّل دخولك بقوقل عشان نعرف معرّفك — تحتاجه في خطوتين.";
+      run();
+    });
+  }, 300);
+})();
+</script>
+</body></html>

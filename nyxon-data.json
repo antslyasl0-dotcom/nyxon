@@ -1,0 +1,75 @@
+{
+  "_note": "بيانات NYXON الحالية، مسحوبة من التطبيق على claude.ai بتاريخ 2026-11-16. تُستورد من: الإدارة ← استورد بيانات.",
+  "clubs": {
+    "x52vtt7twban": { "name": "NYXON1", "createdAt": "2026-11-15T21:10:19.439Z" }
+  },
+  "players": {
+    "xkp34cwwwxe0": {
+      "name": "Hamza", "gamertag": "Hhahj", "pos": "CM",
+      "clubId": "x52vtt7twban", "role": "player", "titles": [],
+      "userId": "", "photo": "", "createdAt": "2026-11-15T21:10:48.072Z"
+    },
+    "xtf87zjbdveu": {
+      "name": "Hamza", "gamertag": "Hhhh", "pos": "CM",
+      "clubId": "x52vtt7twban", "role": "player", "titles": [],
+      "userId": "", "photo": "", "createdAt": "2026-11-16T00:39:55.974Z"
+    },
+    "xynglkc09k1r": {
+      "name": "حسن", "gamertag": "Jahah", "pos": "CM",
+      "clubId": "x52vtt7twban", "role": "captain", "titles": [],
+      "userId": "", "photo": "", "createdAt": "2026-11-15T21:10:19.439Z"
+    }
+  },
+  "matches": {
+    "xla8t4zf8emr": {
+      "clubId": "x52vtt7twban",
+      "opponent": "NYXOM2",
+      "type": "external",
+      "cupId": "",
+      "date": "2026-11-17T00:47",
+      "status": "played",
+      "scoreFor": 2,
+      "scoreAgainst": 2,
+      "createdAt": "2026-11-15T21:47:43.251Z",
+      "lineup": { "formation": "5-3-2", "slots": [], "bench": [], "locked": false, "by": "", "at": "" },
+      "stats": {
+        "xkp34cwwwxe0": {
+          "played": true, "cat": "CM", "goals": 2, "assists": 1, "shots": 2,
+          "tackles": 2, "passes": 10, "saves": 0, "motm": true, "red": false
+        },
+        "xtf87zjbdveu": {
+          "played": true, "cat": "CM", "goals": 2, "assists": 5, "shots": 0,
+          "tackles": 0, "passes": 0, "saves": 0, "motm": false, "red": false
+        },
+        "xynglkc09k1r": {
+          "played": true, "cat": "CM", "goals": 0, "assists": 0, "shots": 0,
+          "tackles": 0, "passes": 0, "saves": 0, "motm": false, "red": false
+        }
+      }
+    }
+  },
+  "attendance": {},
+  "cups": {},
+  "posts": {
+    "xhtccx1a4t6w": {
+      "title": "Hahj", "body": "تعال",
+      "scope": "x52vtt7twban", "at": "2026-11-15T21:44:55.496Z"
+    }
+  },
+  "config": {
+    "app": { "minMatches": 5, "seasonStart": "" },
+    "scoring": {
+      "global": { "win": 2, "draw": 1, "motm": 3, "red": -3 },
+      "cats": {
+        "GK":  { "cleanSheet": 5, "save": 1, "conceded": -1 },
+        "CB":  { "cleanSheet": 4, "tackle": 1, "goal": 4, "assist": 3 },
+        "FB":  { "cleanSheet": 3, "tackle": 1, "goal": 4, "assist": 3 },
+        "CDM": { "tackle": 1, "pass10": 1, "cleanSheet": 2, "goal": 4, "assist": 3 },
+        "CM":  { "pass10": 1, "goal": 3, "assist": 3, "tackle": 0.5 },
+        "CAM": { "assist": 4, "goal": 3, "shot": 0.5 },
+        "W":   { "goal": 3, "assist": 3, "shot": 0.5 },
+        "ST":  { "goal": 3, "assist": 2, "shot": 0.5 }
+      }
+    }
+  }
+}
