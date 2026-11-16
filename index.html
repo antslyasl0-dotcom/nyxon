@@ -1042,7 +1042,8 @@ function vBoard(){
 
   /* 3 — one headline action, the rest small */
   out+='<div class="pad grid" style="gap:10px">'+
-    '<div class="big"><button class="btn pri" type="button" data-act="new-match">نزّل مباراة</button>'+
+    '<div class="big"><button class="btn pri" type="button" data-act="ea-import">اسحب أرقام EA</button>'+
+      '<button class="btn" type="button" data-act="new-match">نزّل مباراة</button>'+
       (late.length?'<button class="btn" type="button" data-act="result" data-id="'+late[0].id+'">سجّل نتيجة '+esc(late[0].opponent||"المباراة")+"</button>":"")+"</div>"+
     '<div class="row" style="gap:7px">'+
       '<button class="btn sm" type="button" data-act="new-player">+ لاعب</button>'+
@@ -1857,6 +1858,7 @@ function act(a,id,v,e){
   if(a==="scope"){S.ui.scope=e.value;render();return}
   if(a==="all-past"){S.ui.allPast=!S.ui.allPast;render();return}
   if(a==="scoring"){sheetScoring();return}
+  if(a==="ea-import"){location.href="ea-import.html";return}
   if(a==="data-io"){sheetDataIO();return}
   if(a==="data-export"){
     try{

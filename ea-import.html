@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NYXON — استيراد من EA</title>
+<meta name="theme-color" content="#0A0E13">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0A0E13; --surface:#121922; --surface2:#18212C;
+  --line:#26323F; --line-soft:#1C242E;
+  --fg:#E9EEF4; --fg-dim:#B4C0CD; --muted:#7D8B9B;
+  --accent:#E8B33C; --accent-ink:#1A1304; --accent-soft:rgba(232,179,60,.13); --accent-line:rgba(232,179,60,.34);
+  --good:#38B87C; --good-soft:rgba(56,184,124,.14);
+  --mid:#C9772E; --mid-soft:rgba(201,119,46,.16);
+  --bad:#D94B50; --bad-soft:rgba(217,75,80,.14);
+  --font-d:'Readex Pro',system-ui,-apple-system,sans-serif;
+  --font-b:'IBM Plex Sans Arabic','Readex Pro',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#EDF1F5; --surface:#FFFFFF; --surface2:#F4F7FA;
+  --line:#D6DDE6; --line-soft:#E6EBF1;
+  --fg:#101821; --fg-dim:#3B4756; --muted:#64737F;
+  --accent:#8A5B00; --accent-ink:#FFFFFF; --accent-soft:rgba(138,91,0,.10); --accent-line:rgba(138,91,0,.26);
+  --good:#1C8A57; --good-soft:rgba(28,138,87,.12);
+  --mid:#95510F; --mid-soft:rgba(149,81,15,.12);
+  --bad:#B4262C; --bad-soft:rgba(180,38,44,.10);
+  color-scheme:light;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:15px;line-height:1.7;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin-inline:auto;padding:0 16px 72px}
+h1,h2,h3{font-family:var(--font-d);font-weight:600;margin:0;line-height:1.35}
+p{margin:0}
+.bar{background:var(--surface);border-bottom:1px solid var(--accent-line);margin-bottom:20px;
+  padding-top:env(safe-area-inset-top,0px)}
+.bar .in{max-width:720px;margin-inline:auto;display:flex;align-items:center;gap:11px;padding:13px 16px}
+.bar img{width:38px;height:38px;border-radius:11px;background:#0A0E13}
+.bar b{font-family:var(--font-d);letter-spacing:.14em;font-size:17px;color:var(--accent)}
+.bar small{display:block;letter-spacing:0;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:3px}
+.bar a.home{margin-inline-start:auto;color:var(--muted);text-decoration:none;font-size:13px;
+  border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:13px;margin-bottom:15px;overflow:hidden}
+.card-h{padding:13px 15px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px}
+.card-h h2{font-size:15.5px}
+.step-n{flex:0 0 auto;width:23px;height:23px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:12.5px;font-weight:700}
+.pad{padding:15px}
+.pad>*+*{margin-top:12px}
+
+label{display:block;font-size:12px;color:var(--muted);font-family:var(--font-d);margin-bottom:5px}
+input[type=text],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--fg);
+  border-radius:9px;padding:10px 12px;font-family:var(--font-b);font-size:15px}
+textarea{min-height:120px;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;
+  line-height:1.5;resize:vertical}
+.btn{font-family:var(--font-d);font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px;
+  border:1px solid var(--line);background:var(--surface2);color:var(--fg);cursor:pointer}
+.btn.pri{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.sm{font-size:13px;padding:8px 13px}
+.btn.wide{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+
+.note{font-size:13px;color:var(--muted)}
+.warn{background:var(--mid-soft);border:1px solid var(--mid);border-radius:10px;padding:12px;font-size:13.5px}
+.err{background:var(--bad-soft);border:1px solid var(--bad);border-radius:10px;padding:12px;font-size:13.5px}
+.ok{background:var(--good-soft);border:1px solid var(--good);border-radius:10px;padding:12px;font-size:13.5px}
+code{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.5px;
+  direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:ui-monospace,Menlo,monospace}
+a{color:var(--accent)}
+.tag{direction:ltr;unicode-bidi:isolate;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+
+.m{border-bottom:1px solid var(--line-soft);padding:11px 15px;display:flex;gap:11px;align-items:flex-start}
+.m:last-child{border-bottom:0}
+.m input[type=checkbox]{flex:0 0 auto;width:19px;height:19px;margin-top:3px;accent-color:var(--accent)}
+.m .b{flex:1 1 auto;min-width:0}
+.m .t{font-family:var(--font-d);font-size:14.5px;display:flex;gap:7px;align-items:baseline;flex-wrap:wrap}
+.m .s{font-family:var(--font-d);font-weight:700;font-size:15px;direction:ltr;unicode-bidi:isolate}
+.m .s.w{color:var(--good)} .m .s.l{color:var(--bad)} .m .s.d{color:var(--muted)}
+.m .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.pill{font-size:11px;font-family:var(--font-d);border-radius:999px;padding:2px 8px;border:1px solid}
+.pill.new{color:var(--good);border-color:var(--good);background:var(--good-soft)}
+.pill.dup{color:var(--muted);border-color:var(--line)}
+
+.pm{border-bottom:1px solid var(--line-soft);padding:11px 15px}
+.pm:last-child{border-bottom:0}
+.pm .hd{display:flex;justify-content:space-between;gap:9px;align-items:baseline;margin-bottom:7px}
+.pm .hd b{font-family:ui-monospace,Menlo,monospace;font-size:13.5px;direction:ltr;unicode-bidi:isolate}
+.pm .hd span{font-size:12px;color:var(--muted);white-space:nowrap}
+
+.bars{height:7px;background:var(--surface2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bars i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.hide{display:none!important}
+.cnt{font-family:var(--font-d);font-weight:700;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="in">
+  <img src="icon-192.png" alt="">
+  <span><b>NYXON</b><small>استيراد من EA برو كلوب</small></span>
+  <a class="home" href="index.html">التطبيق</a>
+</div></header>
+
+<div class="wrap">
+
+  <div class="card"><div class="pad">
+    <p>بعد كل جلسة لعب: افتح الرابط، انسخ النص، الصقه هنا. أرقام الجلسة كلها تدخل التطبيق بضغطة.</p>
+    <p class="note">ما تكتب رقم بيدك. الصدارة والنقاط والترتيب تتحدّث لحالها عند الجميع.</p>
+  </div></div>
+
+  <!-- 1 — sign in -->
+  <div class="card" id="cAuth">
+    <div class="card-h"><span class="step-n">1</span><h2>دخولك</h2></div>
+    <div class="pad" id="authBody"><p class="note">لحظة…</p></div>
+  </div>
+
+  <!-- 2 — the link + paste -->
+  <div class="card hide" id="cPaste">
+    <div class="card-h"><span class="step-n">2</span><h2>انسخ من EA والصق هنا</h2></div>
+    <div class="pad">
+      <div id="linkBox"></div>
+      <div>
+        <label for="raw">النص اللي نسخته</label>
+        <textarea id="raw" placeholder='[{"matchId":"…' spellcheck="false" autocapitalize="off"></textarea>
+      </div>
+      <button class="btn pri wide" type="button" id="goRead">اقرأ النص</button>
+      <div id="readOut"></div>
+    </div>
+  </div>
+
+  <!-- 3 — which club, which players -->
+  <div class="card hide" id="cMap">
+    <div class="card-h"><span class="step-n">3</span><h2>الربط</h2></div>
+    <div class="pad" id="mapBody"></div>
+  </div>
+
+  <!-- 4 — matches -->
+  <div class="card hide" id="cMatches">
+    <div class="card-h"><span class="step-n">4</span><h2>المباريات</h2></div>
+    <div id="mList"></div>
+    <div class="pad" style="border-top:1px solid var(--line-soft)">
+      <button class="btn pri wide" type="button" id="goImport">استورد المحدّد</button>
+      <div class="bars hide" id="prog"><i></i></div>
+      <div id="impOut"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="config.js"></script>
+<script src="nyxon-runtime.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (s) { return document.querySelector(s); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function n(v) { var x = Number(v); return isFinite(x) ? x : 0; }
+  function uid() { return "x" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4); }
+  function show(el) { el.classList.remove("hide"); }
+  function hide(el) { el.classList.add("hide"); }
+
+  /* Firestore refuses undefined; strip it the way the app does */
+  function clean(v) {
+    if (v === undefined || v === null) return null;
+    if (Array.isArray(v)) { var a = []; for (var i = 0; i < v.length; i++) a.push(clean(v[i])); return a; }
+    if (typeof v === "object") {
+      var o = {};
+      for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k) && v[k] !== undefined) o[k] = clean(v[k]);
+      return o;
+    }
+    return v;
+  }
+
+  /* EA serves UTF-8, but a copy-paste trip can leave it read as Latin-1
+     ("Ù…Ù„Ø¹Ø¨" instead of "ملعب"). Rebuild the bytes and decode them properly;
+     if that is not valid UTF-8, the text was fine as it stood. */
+  function fixText(s) {
+    s = String(s == null ? "" : s);
+    if (!/[\u0080-ÿ]/.test(s)) return s;
+    for (var i = 0; i < s.length; i++) if (s.charCodeAt(i) > 255) return s;
+    try {
+      var b = new Uint8Array(s.length);
+      for (var j = 0; j < s.length; j++) b[j] = s.charCodeAt(j);
+      return new TextDecoder("utf-8", { fatal: true }).decode(b);
+    } catch (e) { return s; }
+  }
+
+  function dtLocal(ms) {
+    var d = new Date(ms), p = function (x) { return (x < 10 ? "0" : "") + x; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) +
+           "T" + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function dtAr(ms) {
+    try {
+      return new Date(ms).toLocaleString("ar", {
+        weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit"
+      });
+    } catch (e) { return dtLocal(ms); }
+  }
+
+  /* ---------- NYXON domain (same tables the app uses) ---------- */
+  var POS = [
+    { id: "GK", ar: "حارس", cat: "GK" }, { id: "CB", ar: "قلب دفاع", cat: "CB" },
+    { id: "LB", ar: "ظهير أيسر", cat: "FB" }, { id: "RB", ar: "ظهير أيمن", cat: "FB" },
+    { id: "CDM", ar: "ارتكاز", cat: "CDM" }, { id: "CM", ar: "وسط", cat: "CM" },
+    { id: "CAM", ar: "صانع ألعاب", cat: "CAM" }, { id: "LW", ar: "جناح أيسر", cat: "W" },
+    { id: "RW", ar: "جناح أيمن", cat: "W" }, { id: "ST", ar: "مهاجم", cat: "ST" }
+  ];
+  function catOf(posId) {
+    for (var i = 0; i < POS.length; i++) if (POS[i].id === posId) return POS[i].cat;
+    return "CM";
+  }
+  /* EA says only goalkeeper / defender / midfielder / forward */
+  var EAPOS = { goalkeeper: "GK", defender: "CB", midfielder: "CM", forward: "ST" };
+
+  /* ---------- state ---------- */
+  var S = {
+    db: null, email: null,
+    clubs: [], players: [], matches: {},     /* matches: existing ids -> doc */
+    cfg: { club: {}, players: {} },          /* the saved map, config/eaimport */
+    eaClub: "", parsed: [], rows: [],        /* rows: one per match, ready to write */
+    tags: {}                                 /* taglower -> {tag,pos,count,eaId} */
+  };
+
+  /* ================= 1. sign in ================= */
+  function authUI() {
+    var b = $("#authBody");
+    if (!S.email) {
+      b.innerHTML =
+        '<p>الاستيراد يكتب في بيانات الكلان، فيحتاج دخولك بقوقل — بنفس الإيميل ' +
+        'المكتوب في ملفك داخل التطبيق.</p>' +
+        '<div class="row" style="margin-top:12px"><button class="btn pri" type="button" id="si">' +
+        'دخول بقوقل</button></div>';
+      $("#si").addEventListener("click", function () {
+        window.nyxonSignIn().catch(function (e) {
+          b.insertAdjacentHTML("beforeend",
+            '<div class="err" style="margin-top:12px">ما تم الدخول. ' + esc((e && e.code) || "") + "</div>");
+        });
+      });
+      hide($("#cPaste"));
+      return;
+    }
+    b.innerHTML = '<div class="ok">داخل باسم <b class="tag">' + esc(S.email) + "</b></div>" +
+      '<div class="row" style="margin-top:12px"><button class="btn sm" type="button" id="so">خروج</button></div>';
+    $("#so").addEventListener("click", function () { window.nyxonSignOut(); });
+    show($("#cPaste"));
+    loadAll();
+  }
+
+  /* ================= load what the app already has ================= */
+  var loaded = false;
+  function loadAll() {
+    if (loaded) return;
+    loaded = true;
+    Promise.all([
+      S.db.collection("clubs").get(),
+      S.db.collection("players").get(),
+      S.db.collection("matches").get(),
+      S.db.doc("config/eaimport").get()
+    ]).then(function (r) {
+      S.clubs = r[0].docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; });
+      S.players = r[1].docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; });
+      r[2].docs.forEach(function (d) { S.matches[d.id] = d.data() || {}; });
+      var c = r[3].exists ? (r[3].data() || {}) : {};
+      S.cfg = { club: c.club || {}, players: c.players || {} };
+      linkBox();
+    }, function (e) {
+      $("#linkBox").innerHTML = '<div class="err">ما انقرأت بيانات التطبيق. ' +
+        esc((e && e.code) || "") + "</div>";
+    });
+  }
+
+  /* the EA link, with his own club id filled in when we know it */
+  function linkBox() {
+    var ids = Object.keys(S.cfg.club || {});
+    var cid = ids.length ? ids[0] : "";
+    var url = "https://proclubs.ea.com/api/fc/clubs/matches?platform=common-gen5&clubIds=" +
+              (cid || "رقم-ناديك") + "&matchType=leagueMatch&maxResultCount=10";
+    $("#linkBox").innerHTML = cid
+      ? '<p class="note">افتح هذا الرابط في صفحة جديدة، حدّد النص كله وانسخه:</p>' +
+        '<p style="margin-top:7px"><a href="' + esc(url) + '" target="_blank" rel="noopener">' +
+        'افتح مباريات الدوري على EA ↗</a></p>' +
+        '<p class="note" style="margin-top:7px">وللمباريات الودية بدّل ' +
+        '<code>leagueMatch</code> بـ <code>playoffMatch</code>.</p>'
+      : '<p class="note">الصق نص المباريات اللي نسخته من EA. أول مرة بنعرف منه رقم ناديك، ' +
+        'وبعدها الرابط يطلع لك هنا جاهز.</p>';
+  }
+
+  /* ================= 2. read the pasted text ================= */
+  $("#goRead").addEventListener("click", function () {
+    var out = $("#readOut"); out.innerHTML = "";
+    var txt = $("#raw").value.trim();
+    if (!txt) { out.innerHTML = '<div class="warn">الصق النص أول.</div>'; return; }
+
+    var i = txt.search(/[\[{]/);
+    if (i > 0) txt = txt.slice(i);
+    var data;
+    try { data = JSON.parse(txt); }
+    catch (e) {
+      out.innerHTML = '<div class="err"><b>النص مو كامل.</b><br>' +
+        'غالباً النسخ قطع نصه. ارجع لصفحة EA، اضغط <b>تحديد الكل</b> ثم انسخ، ' +
+        'ولا تقص من النص شي.</div>';
+      return;
+    }
+    if (!Array.isArray(data)) {
+      if (data && data.matchId) data = [data];
+      else {
+        out.innerHTML = '<div class="err"><b>هذا مو نص المباريات.</b><br>' +
+          'الرابط الصحيح ينتهي بـ <code>clubs/matches</code> — واللي لصقته شكله رد رابط ثاني.</div>';
+        return;
+      }
+    }
+    var good = data.filter(function (m) { return m && m.matchId && m.clubs; });
+    if (!good.length) {
+      out.innerHTML = '<div class="err">ما لقيت ولا مباراة في النص.</div>';
+      return;
+    }
+    S.parsed = good;
+    out.innerHTML = '<div class="ok">قرأت <span class="cnt">' + good.length + '</span> مباراة.</div>';
+    pickClub();
+  });
+
+  /* which club in the text is ours: the one in every match */
+  function pickClub() {
+    var count = {}, names = {};
+    S.parsed.forEach(function (m) {
+      Object.keys(m.clubs || {}).forEach(function (cid) {
+        count[cid] = (count[cid] || 0) + 1;
+        var d = (m.clubs[cid] || {}).details || {};
+        if (d.name) names[cid] = fixText(d.name);
+      });
+    });
+    var ids = Object.keys(count).sort(function (a, b) { return count[b] - count[a]; });
+    var saved = Object.keys(S.cfg.club || {})[0];
+    S.eaClub = (saved && count[saved]) ? saved : (ids[0] || "");
+    S.eaNames = names;
+    S.eaCount = count;
+    S.eaIds = ids.filter(function (x) { return count[x] > 1; });
+    if (!S.eaIds.length) S.eaIds = ids.slice(0, 1);
+    mapUI();
+  }
+
+  /* ================= 3. the mapping ================= */
+  function clubOpts(sel) {
+    return '<option value="">— اختر —</option>' + S.clubs.map(function (c) {
+      return '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" +
+             esc(c.name || c.id) + "</option>";
+    }).join("");
+  }
+  function playerOpts(sel) {
+    var mine = S.players.slice().sort(function (a, b) {
+      return String(a.name || "").localeCompare(String(b.name || ""), "ar");
+    });
+    return '<option value="">— تجاهله —</option>' +
+      '<option value="+"' + (sel === "+" ? " selected" : "") + ">➕ أضفه لاعباً جديداً</option>" +
+      mine.map(function (p) {
+        return '<option value="' + esc(p.id) + '"' + (p.id === sel ? " selected" : "") + ">" +
+               esc(p.name || "بدون اسم") + (p.gamertag ? " · " + esc(p.gamertag) : "") + "</option>";
+      }).join("");
+  }
+
+  function mapUI() {
+    /* every gamertag that actually played for our club, in this text */
+    S.tags = {};
+    S.parsed.forEach(function (m) {
+      var ps = (m.players || {})[S.eaClub] || {};
+      Object.keys(ps).forEach(function (eaId) {
+        var p = ps[eaId] || {};
+        if (n(p.secondsPlayed) <= 0) return;                 /* never got on the pitch */
+        var tag = fixText(p.playername || "").trim();
+        var key = tag ? tag.toLowerCase() : "#" + eaId;
+        var t = S.tags[key] || (S.tags[key] = { tag: tag, eaId: eaId, count: 0, pos: p.pos || "" });
+        t.count++;
+        if (!t.pos) t.pos = p.pos || "";
+      });
+    });
+
+    /* resolve each tag: saved map first, then the player's own gamertag */
+    var byTag = {};
+    S.players.forEach(function (p) {
+      var g = String(p.gamertag || "").trim().toLowerCase();
+      if (g) byTag[g] = p.id;
+    });
+    var known = [], unknown = [];
+    Object.keys(S.tags).forEach(function (key) {
+      var t = S.tags[key];
+      if (Object.prototype.hasOwnProperty.call(S.cfg.players, key) &&
+          S.cfg.players[key] !== "+") {
+        t.pid = S.cfg.players[key];       /* "" means: he chose to ignore this one */
+        t.how = "saved";
+      } else if (byTag[key]) {
+        t.pid = byTag[key]; t.how = "tag";
+      } else { t.pid = undefined; t.how = ""; }
+      (t.pid === undefined ? unknown : known).push(key);
+    });
+    var sortTag = function (a, b) { return S.tags[b].count - S.tags[a].count; };
+    known.sort(sortTag); unknown.sort(sortTag);
+    S.known = known; S.unknown = unknown;
+
+    var nyClub = S.cfg.club[S.eaClub] || "";
+    var h = "";
+
+    /* club */
+    h += '<div class="grid2">';
+    if (S.eaIds.length > 1) {
+      h += '<div><label for="eaClub">ناديك في النص</label><select id="eaClub">' +
+        S.eaIds.map(function (cid) {
+          return '<option value="' + esc(cid) + '"' + (cid === S.eaClub ? " selected" : "") + ">" +
+                 esc(S.eaNames[cid] || cid) + " (" + S.eaCount[cid] + ")</option>";
+        }).join("") + "</select></div>";
+    } else {
+      h += '<div><label>ناديك في النص</label><p><b>' + esc(S.eaNames[S.eaClub] || S.eaClub) +
+           '</b> <span class="note">· رقم ' + esc(S.eaClub) + "</span></p></div>";
+    }
+    h += '<div><label for="nyClub">يقابله في التطبيق</label><select id="nyClub">' +
+         clubOpts(nyClub) + "</select></div></div>";
+    if (!S.clubs.length) {
+      h += '<div class="warn">ما فيه نادي في التطبيق. أضف نادي من: الإدارة ← الأندية.</div>';
+    }
+
+    /* matched players */
+    h += '<div style="margin-top:4px"><p class="note">اللاعبين المعروفين: <span class="cnt">' +
+         known.filter(function (k) { return S.tags[k].pid; }).length + '</span> — تطابقوا بالـgamertag.</p></div>';
+
+    /* the ones we do not know yet */
+    if (unknown.length) {
+      h += '<div class="warn"><b>' + unknown.length + ' اسم ما نعرفه.</b><br>' +
+           'حدّد لكل واحد مين هو. اختيارك ينحفظ، فالمرة الجاية يمشي لحاله.</div>' +
+           '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">' +
+           unknown.map(function (key) {
+             var t = S.tags[key];
+             return '<div class="pm"><div class="hd"><b>' + esc(t.tag || "(بدون اسم · " + t.eaId + ")") +
+               "</b><span>" + t.count + " مباراة · " + esc(t.pos || "?") + "</span></div>" +
+               '<select data-tag="' + esc(key) + '" class="psel">' + playerOpts("") + "</select></div>";
+           }).join("") + "</div>";
+    }
+
+    /* players in the app whose gamertag is still empty — the usual reason for a miss */
+    var noTag = S.players.filter(function (p) { return !String(p.gamertag || "").trim(); });
+    if (noTag.length && unknown.length) {
+      h += '<p class="note">ملاحظة: ' + noTag.length + ' لاعب عندك بدون gamertag (' +
+           esc(noTag.slice(0, 4).map(function (p) { return p.name || "?"; }).join("، ")) +
+           (noTag.length > 4 ? "…" : "") + '). لو كتبت اسمه في اللعبة داخل ملفه، ' +
+           'يتطابق لحاله بدون ما تختار.</p>';
+    }
+
+    h += '<button class="btn pri wide" type="button" id="goMap" style="margin-top:4px">تمام، كمّل</button>';
+    $("#mapBody").innerHTML = h;
+    show($("#cMap"));
+    hide($("#cMatches"));
+
+    var sel = $("#eaClub");
+    if (sel) sel.addEventListener("change", function () { S.eaClub = this.value; mapUI(); });
+    $("#goMap").addEventListener("click", applyMap);
+    try { $("#cMap").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+  }
+
+  function applyMap() {
+    var nyClub = $("#nyClub") ? $("#nyClub").value : "";
+    if (!nyClub) { alert("اختر النادي اللي يقابله في التطبيق."); return; }
+    S.cfg.club = {}; S.cfg.club[S.eaClub] = nyClub;
+
+    /* what he just chose for the unknown names */
+    var pend = [];
+    Array.prototype.forEach.call(document.querySelectorAll(".psel"), function (el) {
+      var key = el.getAttribute("data-tag"), v = el.value;
+      if (v === "+") { pend.push(key); S.cfg.players[key] = "+"; }
+      else S.cfg.players[key] = v;        /* "" = ignore, on purpose */
+    });
+
+    /* create the new players he asked for, dated to their first match here */
+    var jobs = pend.map(function (key) {
+      var t = S.tags[key];
+      var first = Infinity;
+      S.parsed.forEach(function (m) {
+        var ps = (m.players || {})[S.eaClub] || {};
+        var hit = Object.keys(ps).some(function (id) {
+          var p = ps[id] || {};
+          var k2 = (fixText(p.playername || "").trim() || "#" + id).toLowerCase();
+          return k2 === key && n(p.secondsPlayed) > 0;
+        });
+        if (hit) first = Math.min(first, n(m.timestamp) * 1000);
+      });
+      var pid = uid();
+      var pos = EAPOS[String(t.pos || "").toLowerCase()] || "CM";
+      var body = {
+        name: t.tag || ("لاعب " + t.eaId.slice(-4)), gamertag: t.tag || "",
+        pos: pos, clubId: nyClub, role: "player", email: "", userId: "", titles: [], photo: "",
+        /* dated to his first match, so he is not counted absent from games before it */
+        createdAt: new Date(isFinite(first) ? first : Date.now()).toISOString()
+      };
+      return S.db.doc("players/" + pid).set(clean(body)).then(function () {
+        S.players.push(Object.assign({ id: pid }, body));
+        S.cfg.players[key] = pid;
+        S.tags[key].pid = pid;
+      });
+    });
+
+    var b = $("#goMap");
+    b.disabled = true; b.textContent = "لحظة…";
+    Promise.all(jobs).then(function () {
+      return S.db.doc("config/eaimport").set(clean({
+        club: S.cfg.club, players: S.cfg.players, at: new Date().toISOString()
+      }));
+    }).then(function () {
+      /* fill in the resolved player for every tag */
+      Object.keys(S.tags).forEach(function (key) {
+        var v = S.cfg.players[key];
+        if (v !== undefined && v !== "+") S.tags[key].pid = v;
+      });
+      b.disabled = false; b.textContent = "تمام، كمّل";
+      linkBox();
+      buildRows();
+    }, function (e) {
+      b.disabled = false; b.textContent = "تمام، كمّل";
+      $("#mapBody").insertAdjacentHTML("beforeend",
+        '<div class="err" style="margin-top:12px">ما انحفظ الربط. ' +
+        ((e && e.code) === "invalid_argument"
+          ? "ما عندك صلاحية إدارة على هذا الحساب."
+          : esc((e && e.code) || "")) + "</div>");
+    });
+  }
+
+  /* ================= 4. turn each EA match into a NYXON match ================= */
+  function buildRows() {
+    var nyClub = S.cfg.club[S.eaClub];
+    S.rows = [];
+
+    S.parsed.forEach(function (m) {
+      var mine = (m.clubs || {})[S.eaClub];
+      if (!mine) return;
+      var theirId = Object.keys(m.clubs).filter(function (c) { return c !== S.eaClub; })[0] || "";
+      var theirs = (m.clubs[theirId] || {}).details || {};
+      var ms = n(m.timestamp) * 1000;
+      var sf = n(mine.goals), sa = n(mine.goalsAgainst);
+
+      var ps = (m.players || {})[S.eaClub] || {};
+      var stats = {}, att = {}, used = 0, skipped = [], motmTaken = false;
+
+      /* man of the match: EA marks it on one player */
+      var motmId = "";
+      Object.keys(ps).forEach(function (eaId) {
+        if (!motmId && n((ps[eaId] || {}).mom) > 0) motmId = eaId;
+      });
+
+      Object.keys(ps).forEach(function (eaId) {
+        var p = ps[eaId] || {};
+        if (n(p.secondsPlayed) <= 0) return;
+        var tag = fixText(p.playername || "").trim();
+        var key = tag ? tag.toLowerCase() : "#" + eaId;
+        var pid = S.tags[key] ? S.tags[key].pid : undefined;
+        if (!pid) { skipped.push(tag || eaId); return; }
+
+        var prof = null;
+        for (var i = 0; i < S.players.length; i++) if (S.players[i].id === pid) prof = S.players[i];
+        var eaCat = EAPOS[String(p.pos || "").toLowerCase()] || "";
+        var cat;
+        if (eaCat === "GK") cat = "GK";                       /* EA knows who kept goal */
+        else {
+          cat = prof ? catOf(prof.pos) : (eaCat ? catOf(eaCat) : "CM");
+          if (cat === "GK") cat = catOf(eaCat || "CM");       /* a keeper who played out */
+        }
+
+        var st = {
+          played: true, cat: cat,
+          goals: n(p.goals), assists: n(p.assists), shots: n(p.shots),
+          tackles: n(p.tacklesmade), passes: n(p.passesmade), saves: n(p.saves),
+          motm: !motmTaken && eaId === motmId, red: n(p.redcards) > 0
+        };
+        if (st.motm) motmTaken = true;
+        if (cat === "GK") {
+          /* EA reports 0 for a keeper in a quit match; the club's own tally is right */
+          var gc = n(p.goalsconceded);
+          st.conceded = (gc === 0 && sa > 0) ? sa : gc;
+        }
+        stats[pid] = st;
+        att[pid] = "in";
+        used++;
+      });
+
+      var mid = "ea_" + String(m.matchId);
+      var ex = S.matches[mid] || null;
+      var body = {
+        date: dtLocal(ms), opponent: fixText(theirs.name || "خصم"),
+        clubId: nyClub, type: "external", cupId: "",
+        status: "played", scoreFor: sf, scoreAgainst: sa,
+        stats: stats,
+        attendance: Object.assign({}, (ex && ex.attendance) || {}, att),
+        lineup: (ex && ex.lineup) || null,
+        createdAt: (ex && ex.createdAt) || new Date().toISOString(),
+        eaMatchId: String(m.matchId), eaClubId: String(S.eaClub),
+        eaAt: new Date().toISOString()
+      };
+
+      S.rows.push({
+        id: mid, body: body, ms: ms, used: used, skipped: skipped,
+        dup: !!ex, sf: sf, sa: sa, opp: body.opponent,
+        dnf: n(mine.winnerByDnf) > 0 || n((m.clubs[theirId] || {}).winnerByDnf) > 0
+      });
+    });
+
+    S.rows.sort(function (a, b) { return b.ms - a.ms; });
+    matchesUI();
+  }
+
+  function matchesUI() {
+    if (!S.rows.length) {
+      $("#mList").innerHTML = '<div class="pad"><div class="warn">ما فيه مباراة لناديك في النص.</div></div>';
+      show($("#cMatches"));
+      return;
+    }
+    $("#mList").innerHTML = S.rows.map(function (r, i) {
+      var cls = r.sf > r.sa ? "w" : r.sf < r.sa ? "l" : "d";
+      return '<label class="m"><input type="checkbox" data-i="' + i + '"' +
+        (r.dup ? "" : " checked") + ">" +
+        '<span class="b"><span class="t"><span class="s ' + cls + '">' + r.sf + " – " + r.sa +
+        "</span> <span>" + esc(r.opp) + "</span> " +
+        '<span class="pill ' + (r.dup ? "dup" : "new") + '">' + (r.dup ? "موجودة" : "جديدة") + "</span>" +
+        (r.dnf ? ' <span class="pill dup">انقطعت</span>' : "") + "</span>" +
+        '<span class="sub">' + esc(dtAr(r.ms)) + " · " + r.used + " لاعب" +
+        (r.skipped.length ? " · تجاهلت " + r.skipped.length : "") + "</span></span></label>";
+    }).join("");
+    var nNew = S.rows.filter(function (r) { return !r.dup; }).length;
+    $("#impOut").innerHTML = '<p class="note" style="margin-top:10px">' +
+      (nNew ? "<b>" + nNew + "</b> مباراة جديدة. " : "كلها موجودة عندك أصلاً. ") +
+      'الموجودة محددة مسبقاً إنها ما تنسحب — حدّدها لو تبي تحدّث أرقامها (تشكيلتها تبقى).</p>';
+    show($("#cMatches"));
+    try { $("#cMatches").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+  }
+
+  /* ================= write ================= */
+  $("#goImport").addEventListener("click", function () {
+    var pick = [];
+    Array.prototype.forEach.call(document.querySelectorAll('#mList input[type=checkbox]'), function (el) {
+      if (el.checked) pick.push(S.rows[n(el.getAttribute("data-i"))]);
+    });
+    if (!pick.length) { $("#impOut").innerHTML = '<div class="warn">ما حددت ولا مباراة.</div>'; return; }
+
+    var btn = this, bar = $("#prog"), fill = bar.querySelector("i");
+    btn.disabled = true; btn.textContent = "جاري الاستيراد…";
+    show(bar);
+    var i = 0, ok = 0, bad = 0, firstErr = "";
+
+    (function step() {
+      fill.style.width = Math.round((i / pick.length) * 100) + "%";
+      $("#impOut").innerHTML = '<p class="note">' + i + " / " + pick.length + " …</p>";
+      if (i >= pick.length) {
+        fill.style.width = "100%";
+        btn.disabled = false; btn.textContent = "استورد المحدّد";
+        var tail = firstErr === "invalid_argument"
+          ? "<br>ما عندك صلاحية كتابة على المباريات بهذا الحساب."
+          : (firstErr ? '<br><span class="tag">' + esc(firstErr) + "</span>" : "");
+        $("#impOut").innerHTML = bad
+          ? '<div class="' + (ok ? "warn" : "err") + '">دخلت <b>' + ok +
+            "</b> مباراة، وفشلت <b>" + bad + "</b>." + tail + "</div>"
+          : '<div class="ok"><b>تمّت.</b> دخلت <span class="cnt">' + ok + '</span> مباراة. ' +
+            '<a href="index.html">افتح التطبيق</a> وشوف الصدارة.</div>';
+        return;
+      }
+      var r = pick[i++];
+      S.db.doc("matches/" + r.id).set(clean(r.body)).then(function () {
+        S.matches[r.id] = r.body; ok++; step();
+      }, function (e) {
+        bad++; if (!firstErr) firstErr = (e && e.code) || "unknown"; step();
+      });
+    })();
+  });
+
+  /* ================= boot ================= */
+  window.claude.use("db").then(function (db) {
+    S.db = db;
+    return window.claude.use("user");
+  }).then(function (u) { return u.email(); })
+    .then(function (mail) { S.email = mail || null; authUI(); })
+    .catch(function () { $("#authBody").innerHTML = '<div class="err">ما قدرنا نوصل Firebase.</div>'; });
+
+  window.nyxonAuthChanged = function () {
+    S.email = (window.NYXON_USER && window.NYXON_USER.email) || null;
+    authUI();
+  };
+})();
+</script>
+</body></html>
