@@ -344,7 +344,7 @@ function posAr(id){var p=byId(POS,id);return p?p.ar:id}
 function catOb(id){return byId(CAT,id)||CAT[0]}
 
 /* ---------- state ---------- */
-var S={db:null,user:null,uid:null,canWrite:null,adminLevel:false,offline:false,slow:false,booted:false,attIdx:{},
+var S={db:null,user:null,uid:null,email:null,canWrite:null,adminLevel:false,offline:false,slow:false,booted:false,attIdx:{},
  scoring:DEF_SCORING,cfg:{minMatches:5,seasonStart:""},
  clubs:[],players:[],matches:[],cups:[],posts:[],requests:[],claims:[],
  got:{},view:"leaders",modal:false,
@@ -368,7 +368,17 @@ function tiles(arr){return '<div class="tiles">'+arr.map(function(t){
   if(t[3])return '<button class="tile'+(t[2]?" hi":"")+'" type="button" data-act="view" data-id="'+esc(t[3])+'">'+in_+"</button>";
   return '<div class="tile'+(t[2]?" hi":"")+'">'+in_+"</div>"}).join("")+"</div>"}
 
-function linkedMe(){if(!S.uid)return null;for(var i=0;i<S.players.length;i++)if(S.players[i].userId===S.uid)return S.players[i];return null}
+/* two ways to be recognised: an approved claim (userId), or simply the email
+   the admin wrote on your player record — the second needs nobody's approval */
+function linkedMe(){
+  var i,p;
+  if(S.uid)for(i=0;i<S.players.length;i++)if(S.players[i].userId===S.uid)return S.players[i];
+  if(S.email)for(i=0;i<S.players.length;i++){
+    p=S.players[i];
+    if(p.email&&String(p.email).toLowerCase()===S.email)return p;
+  }
+  return null;
+}
 function me(){var l=linkedMe();if(l)return l;if(S.localId)return byId(S.players,S.localId);return null}
 function canAct(){return canWriteData()&&!!linkedMe()}
 function myClaim(){if(!S.uid)return null;for(var i=0;i<S.claims.length;i++)if(S.claims[i].userId===S.uid)return S.claims[i];return null}
@@ -1461,7 +1471,10 @@ function sheetPlayer(p){
     '<div><label for="pTag">اليوزر في اللعبة</label><input type="text" id="pTag" value="'+esc(p.gamertag||"")+'"></div>'+
     '<div><label for="pPos">المركز</label><select id="pPos">'+opts(POS,p.pos)+"</select></div>"+
     '<div><label for="pClub">النادي</label><select id="pClub">'+clubOpts(p.clubId)+"</select></div>"+
-    (adm?'<div><label for="pRole">الرتبة</label><select id="pRole">'+opts(ROLES,p.role||"player")+"</select></div>":"")+"</div>"+
+    (adm?'<div><label for="pRole">الرتبة</label><select id="pRole">'+opts(ROLES,p.role||"player")+"</select></div>"+
+      '<div><label for="pMail">إيميل قوقل</label><input type="email" id="pMail" inputmode="email" autocapitalize="off" '+
+      'value="'+esc(p.email||"")+'" placeholder="name@gmail.com"></div>':"")+"</div>"+
+    (adm?'<p class="note">اكتب إيميل قوقل حقه، وأول ما يسجّل دخول بنفس الإيميل تشتغل رتبته فوراً — بدون طلب ولا موافقة.</p>':"")+
     (p.id&&adm?'<p class="note">نقل اللاعب لنادي ثاني: غيّر النادي واحفظ.</p>':""),
     '<button class="btn" type="button" data-act="close">إلغاء</button>'+
     (p.id&&adm?'<button class="btn danger" type="button" data-act="player-del" data-id="'+p.id+'">حذف</button>':"")+
@@ -1992,9 +2005,18 @@ function act(a,id,v,e){
     p=id?byId(S.players,id):null;
     var body={name:nm,gamertag:val("pTag").trim(),pos:val("pPos"),clubId:val("pClub"),
       role:$("#pRole")?val("pRole"):(p?p.role||"player":"player")};
+    body.email=$("#pMail")?val("pMail").trim().toLowerCase():(p?(p.email||""):"");
     if(p){body.userId=p.userId||"";body.titles=p.titles||[];body.createdAt=p.createdAt||new Date().toISOString();body.photo=p.photo||""}
     else{body.userId="";body.titles=[];body.photo="";body.createdAt=new Date().toISOString()}
-    save("players/"+(id||uid()),body).then(function(){closeSheet();toast("انحفظ")});return;
+    var pid2=id||uid(),oldMail=p?String(p.email||"").toLowerCase():"";
+    save("players/"+pid2,body).then(function(){
+      /* links/<email> is the table the security rules read to answer
+         "which player is this person?" — keep it in step with the profile */
+      var jobs2=[];
+      if(oldMail&&oldMail!==body.email)jobs2.push(del("links/"+oldMail));
+      if(body.email)jobs2.push(save("links/"+body.email,{playerId:pid2,at:new Date().toISOString()}));
+      return Promise.all(jobs2).catch(function(){});
+    }).then(function(){closeSheet();toast("انحفظ")},function(){closeSheet()});return;
   }
   if(a==="player-del"){ask("تحذف ملف اللاعب؟ أرقامه في المباريات تبقى.","حذف",function(){del("players/"+id).then(function(){toast("انحذف")})});return}
   if(a==="club-add"){
@@ -2283,6 +2305,7 @@ window.addEventListener("hashchange",function(){
   /* the runtime calls this whenever the person signs in or out */
   window.nyxonAuthChanged=function(uid){
     S.uid=uid||null;
+    S.email=(window.NYXON_USER&&window.NYXON_USER.email)||null;
     S.owner=!!(uid&&window.NYXON_CONFIG&&uid===window.NYXON_CONFIG.ownerUid);
     S.canWrite=uid?true:false;
     S.asPlayer=false;
@@ -2297,6 +2320,7 @@ window.addEventListener("hashchange",function(){
     var jobs=[];
     if(S.user){
       jobs.push(Promise.resolve(S.user.id()).then(function(x){S.uid=x}).catch(function(){}));
+      if(S.user.email)try{jobs.push(Promise.resolve(S.user.email()).then(function(x){S.email=x}).catch(function(){}))}catch(e){}
       try{jobs.push(Promise.resolve(S.user.canEdit()).then(function(x){S.adminLevel=!!x}).catch(function(){}))}catch(e){}
       try{jobs.push(Promise.resolve(S.user.isOwner()).then(function(x){S.owner=!!x}).catch(function(){}))}catch(e){}
       try{jobs.push(Promise.resolve(S.user.can("data.write")).then(function(x){S.canWrite=x}).catch(function(){}))}catch(e){}

@@ -125,12 +125,14 @@
   /* ---------- من يفتح الصفحة ----------
      العرض ما يحتاج حساب إطلاقاً. الدخول بقوقل مطلوب فقط لمن يبي
      يعرّف نفسه: يأكد حضوره، أو يدير. */
-  var ME = { uid: null };
+  var ME = { uid: null, email: null };
   var ready = new Promise(function (res) {
     var done = false;
     auth.onAuthStateChanged(function (u) {
       ME.uid = u ? u.uid : null;
-      window.NYXON_USER = u ? { uid: u.uid, name: u.displayName || "", photo: u.photoURL || "" } : null;
+      ME.email = u && u.email ? String(u.email).toLowerCase() : null;
+      window.NYXON_USER = u ? { uid: u.uid, email: ME.email,
+        name: u.displayName || "", photo: u.photoURL || "" } : null;
       if (!done) { done = true; res(); }
       if (typeof window.nyxonAuthChanged === "function") window.nyxonAuthChanged(ME.uid);
     });
@@ -139,7 +141,9 @@
 
   var user = {
     id: function () { return ready.then(function () { return ME.uid; }); },
-    me: function () { return ready.then(function () { return { id: ME.uid }; }); },
+    me: function () { return ready.then(function () { return { id: ME.uid, email: ME.email }; }); },
+    /* the email is what ties a person to the player the owner wrote it on */
+    email: function () { return ready.then(function () { return ME.email; }); },
     isOwner: function () {
       return ready.then(function () { return !!ME.uid && ME.uid === CFG.ownerUid; });
     },

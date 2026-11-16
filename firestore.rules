@@ -1,22 +1,101 @@
 rules_version = '2';
 
-// ⚠️ القواعد المبسّطة — المنشورة حالياً.
+// قواعد NYXON — الصلاحية تتبع الرتبة، والسيرفر هو اللي يفرضها.
+//
+// كيف يعرف السيرفر مين أنت؟
+//   الإدارة تكتب إيميل قوقل في ملف اللاعب، والتطبيق يحفظه كذلك في
+//   links/<الإيميل>. وأول ما الشخص يسجّل دخول بنفس الإيميل، القواعد تقرأ
+//   هذا الجدول وتعرف اسمه ورتبته. ما يحتاج طلب ولا موافقة.
 //
 //   يقرأ:  الكل، بدون حساب.
-//   يكتب:  أي شخص مسجّل دخول بقوقل — بدون نظر لرتبته.
-//
-// فيها راحة: الكابتن والإدارة يشتغلون فوراً بدون طلبات ولا موافقات.
-// وفيها خطر: الرابط عام، فأي شخص يوصله ويسجّل دخول يقدر يمسح اللاعبين
-// ويغيّر النتائج. ما فيه شي يمنعه.
-//
-// النسخة المحكمة محفوظة في firestore.rules.strict — فيها الصلاحية تتبع
-// الرتبة (إدارة / كابتن / نائب / لاعب) ويفرضها السيرفر مو الواجهة.
+//   يكتب:  حسب الرتبة فقط.
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read:  if true;
-      allow write: if request.auth != null;
+
+    function OWNER() { return 'b9iTpBRsxdexdw44633V3IjDU9M2'; }
+
+    function signedIn() { return request.auth != null; }
+    function mail()     { return request.auth.token.email; }
+    function isOwner()  { return signedIn() && request.auth.uid == OWNER(); }
+
+    function hasLink() {
+      return signedIn() && mail() != null
+        && exists(/databases/$(database)/documents/links/$(mail()));
     }
+    function myPlayerId() {
+      return get(/databases/$(database)/documents/links/$(mail())).data.playerId;
+    }
+    function myRole() {
+      return get(/databases/$(database)/documents/players/$(myPlayerId())).data.role;
+    }
+
+    function isAdmin() { return isOwner() || (hasLink() && myRole() == 'admin'); }
+    function isStaff() {
+      return isAdmin() || (hasLink() &&
+        (myRole() == 'captain' || myRole() == 'vice'));
+    }
+
+    // لا أحد غير الإدارة يغيّر رتبة أو يعيد ربط حساب
+    function keepsRoleAndLink() {
+      return request.resource.data.role  == resource.data.role
+          && request.resource.data.email == resource.data.email;
+    }
+
+    match /clubs/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    match /players/{id} {
+      allow read:   if true;
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+      allow update: if isAdmin()
+                    || (isStaff() && keepsRoleAndLink())
+                    || (hasLink() && id == myPlayerId() && keepsRoleAndLink());
+    }
+
+    // التشكيلة محفوظة داخل المباراة، ونائب الكابتن يبنيها
+    match /matches/{id} {
+      allow read:  if true;
+      allow write: if isStaff();
+    }
+
+    // كل لاعب يأكد حضوره هو فقط
+    match /attendance/{id} {
+      allow read:   if true;
+      allow write:  if isStaff()
+                    || (hasLink()
+                        && request.resource.data.playerId == myPlayerId()
+                        && request.resource.data.status in ['in', 'excused']);
+      allow delete: if isStaff();
+    }
+
+    match /cups/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /posts/{id}  { allow read: if true; allow write: if isAdmin(); }
+    match /config/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // جدول الربط: الإدارة تكتبه، والقواعد تقرأه
+    match /links/{linkMail} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // المسار القديم: طلب تعريف لمن ما انكتب إيميله
+    match /claims/{claimUid} {
+      allow read:           if isAdmin();
+      allow create, update: if signedIn() && claimUid == request.auth.uid
+                            && request.resource.data.userId == request.auth.uid;
+      allow delete:         if isAdmin() || (signedIn() && claimUid == request.auth.uid);
+    }
+
+    match /requests/{id} {
+      allow read:   if isAdmin();
+      allow create: if signedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} { allow read, write: if false; }
   }
 }
