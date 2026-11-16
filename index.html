@@ -666,8 +666,9 @@ function clean(v){
 }
 function save(path,data){
   return S.db.doc(path).set(clean(data)).then(function(){return true}).catch(function(e){
-    if(e&&e.code==="invalid_argument"){S.canWrite=false;render()}
-    toast(e&&e.code==="invalid_argument"?(S.uid?"ما انحفظ — ما عندك صلاحية":"ما انحفظ — سجّل دخولك أول"):"ما انحفظ، جرّب مرة ثانية");
+    /* the server decides each write on its own path, so a refusal here says
+       nothing about the rest of the screen — don't switch the app to read-only */
+    toast(e&&e.code==="invalid_argument"?(S.uid?"ما انحفظ — ما عندك صلاحية على هذا":"ما انحفظ — سجّل دخولك أول"):"ما انحفظ، جرّب مرة ثانية");
     throw e;
   });
 }
@@ -2070,9 +2071,9 @@ function act(a,id,v,e){
     if(p.userId){toast("هذا الاسم مربوط بحساب ثاني");return}
     var pid=p.id;
     save("claims/"+S.uid,{playerId:pid,userId:S.uid,at:new Date().toISOString()})
-      .then(function(){closeSheet();toast("وصل طلبك للإدارة")},function(){
-        S.localId=pid;try{localStorage.setItem("nyxon.me",pid)}catch(e2){}
-        closeSheet();render();toast("حفظنا اسمك على جهازك — صلاحيتك عرض فقط");
+      .then(function(){closeSheet();toast("وصل طلبك للإدارة")},function(e2){
+        closeSheet();
+        toast("ما وصل الطلب ("+((e2&&e2.code)||"خطأ")+") — جرّب مرة ثانية أو كلّم الإدارة");
       });return;
   }
   if(a==="claim-ok"){

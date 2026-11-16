@@ -99,12 +99,13 @@ service cloud.firestore {
     // ====== الطلبات ======
 
     // طلب تعريف: كل واحد يكتب طلبه هو تحت معرّفه، والإدارة تقرأ وتحذف.
+    // create AND update: a second attempt must not be refused just because
+    // the first one already left a document here
     match /claims/{claimUid} {
-      allow read:   if isAdmin();
-      allow create: if signedIn() && claimUid == uid()
-                    && request.resource.data.userId == uid();
-      allow delete: if isAdmin() || (signedIn() && claimUid == uid());
-      allow update: if false;
+      allow read:           if isAdmin();
+      allow create, update: if signedIn() && claimUid == uid()
+                            && request.resource.data.userId == uid();
+      allow delete:         if isAdmin() || (signedIn() && claimUid == uid());
     }
 
     // طلب انضمام لواحد اسمه مو في القائمة أصلاً
